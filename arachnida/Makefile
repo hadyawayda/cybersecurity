@@ -1,4 +1,4 @@
-.PHONY: install clean all
+.PHONY: install clean all scorpion spider
 
 # Virtual environment directory
 VENV = .venv
@@ -20,6 +20,14 @@ install: $(VENV)
 	$(PYTHON) -m pip install -U pip
 	$(PYTHON) -m pip install -r requirements.txt
 	@echo "Installation complete!"
+
+scorpion: $(VENV)
+	@echo "Launching Scorpion GUI..."
+	$(PYTHON) scorpion_gui.py
+
+spider: $(VENV)
+	@echo "Running Spider..."
+	$(PYTHON) spider.py
 
 clean:
 	@echo "Cleaning up..."

@@ -13,7 +13,7 @@ class ScorpionGUI(tk.Tk):
   main=tk.PanedWindow(self,orient='horizontal'); main.pack(fill='both',expand=True)
   self.preview=tk.Label(main,text='Open an image…',anchor='center'); main.add(self.preview)
   right=tk.Frame(main); main.add(right)
-  self.tree=ttk.Treeview(right,columns=('value',),show='headings',selectmode='browse'); self.tree.heading('value',text='Value'); self.tree['displaycolumns']=('value',); self.tree.pack(side='top',fill='both',expand=True,padx=6,pady=6)
+  self.tree=ttk.Treeview(right,columns=('value',),show='tree headings',selectmode='browse'); self.tree.heading('#0',text='Tag'); self.tree.heading('value',text='Value'); self.tree.column('#0',width=200); self.tree.column('value',width=400); self.tree.pack(side='top',fill='both',expand=True,padx=6,pady=6)
   form=tk.Frame(right); form.pack(fill='x',padx=6,pady=6)
   tk.Label(form,text='Tag name:').grid(row=0,column=0,sticky='e'); self.entry_tag=tk.Entry(form,width=32); self.entry_tag.grid(row=0,column=1,sticky='we',padx=4)
   tk.Label(form,text='Value:').grid(row=1,column=0,sticky='e'); self.entry_val=tk.Entry(form,width=64); self.entry_val.grid(row=1,column=1,sticky='we',padx=4)
@@ -29,8 +29,15 @@ class ScorpionGUI(tk.Tk):
    self.current_path=path
    with Image.open(path) as im:
     im_thumb=im.copy(); im_thumb.thumbnail((480,480)); self._photo=ImageTk.PhotoImage(im_thumb); self.preview.configure(image=self._photo)
-   try: exif_dict=piexif.load(path)
-   except Exception: exif_dict={'0th':{},'Exif':{},'GPS':{},'1st':{}}
+   try: 
+    exif_dict=piexif.load(path)
+    # Check if there's any actual EXIF data
+    has_data = any(exif_dict.get(ifd, {}) for ifd in ('0th','Exif','GPS','1st'))
+    if not has_data:
+     messagebox.showinfo('No Metadata', 'This image has no EXIF metadata.')
+   except Exception as e: 
+    messagebox.showwarning('EXIF Load Error', f'Could not load EXIF data: {e}')
+    exif_dict={'0th':{},'Exif':{},'GPS':{},'1st':{}}
    self.current_exif=exif_dict; self._refresh_tree()
   except Exception as e:
    messagebox.showerror('Error', f'Failed to load: {e}\n{traceback.format_exc()}')
@@ -46,7 +53,8 @@ class ScorpionGUI(tk.Tk):
      except Exception: pass
     self.tree.insert(parent,'end',text=tag_name,values=(val,),iid=f'{name}:{tag_name}')
   for ifd in ('0th','Exif','GPS','1st'): add_ifd(ifd,self.current_exif.get(ifd,{}))
-  self.tree.expand(self.tree.get_children())
+  for item in self.tree.get_children():
+   self.tree.item(item, open=True)
  def set_tag(self):
   tag=self.entry_tag.get().strip(); val=self.entry_val.get()
   if not tag: messagebox.showwarning('Set tag','Enter a tag name'); return
