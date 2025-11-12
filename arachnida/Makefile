@@ -35,3 +35,8 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 	@echo "Clean complete!"
+
+fclean: clean
+	rm -rf data
+
+re: fclean all
