@@ -1,41 +1,45 @@
-#!/usr/bin/env py
+#!/usr/bin/env python3
 from __future__ import annotations
 import argparse, sys, json
-from typing import List
-from arachnida.scorpion.meta import basic_file_info, read_exif
+from typing import List, Dict
+from src.scorpion.meta import basic_file_info, read_exif_human
+from src.scorpion.edit import set_tags, delete_tags, wipe_all_metadata
+
+def parse_kv_list(pairs: List[str]) -> Dict[str, str]:
+ out={}
+ for p in pairs:
+  if '=' not in p: raise SystemExit(f'Invalid --set pair (use Tag=Value): {p}')
+  k,v=p.split('=',1); out[k.strip()]=v
+ return out
 
 def make_parser():
-    p = argparse.ArgumentParser(prog='scorpion', add_help=False, description='Display EXIF and basic metadata for image files.')
-    p.add_argument('files', nargs='+')
-    p.add_argument('--json', action='store_true', help='Output JSON lines')
-    p.add_argument('-h','--help', action='help', help='Show help and exit')
-    return p
+ p=argparse.ArgumentParser(prog='scorpion', add_help=False, description='View and edit EXIF metadata (JPEG/TIFF).')
+ p.add_argument('files', nargs='+', help='Image files'); p.add_argument('--json', action='store_true', help='Output JSON lines'); p.add_argument('--set', dest='set_pairs', metavar='Tag=Value', nargs='*', help='Set EXIF tag(s)'); p.add_argument('--del', dest='del_keys', metavar='Tag', nargs='*', help='Delete EXIF tag(s)'); p.add_argument('--wipe', action='store_true', help='Remove all EXIF metadata'); p.add_argument('-h','--help', action='help', help='Show help and exit'); return p
+
+def show_file(path: str, as_json: bool)->int:
+ base=basic_file_info(path); exif=read_exif_human(path); record={'file':path,'basic':base,'exif':exif}
+ if as_json: print(json.dumps(record, ensure_ascii=False))
+ else:
+  print(f"\n=== {path} ===")
+  for k,v in base.items(): print(f"{k:>12}: {v}")
+  if exif:
+   print("-- EXIF --")
+   for k in sorted(exif.keys()): print(f"{k:>20}: {exif[k]}")
+  else: print("(no EXIF)")
+ return 0
 
 def main(argv: List[str]|None=None)->int:
-    a = make_parser().parse_args(argv)
-    rc = 0
-    for f in a.files:
-        try:
-            rec = {'file': f, 'basic': basic_file_info(f), 'exif': read_exif(f)}
-            print(json.dumps(rec, ensure_ascii=False) if a.json else _fmt(rec))
-        except FileNotFoundError:
-            print(f'scorpion: file not found: {f}', file=sys.stderr); rc |= 1
-        except Exception as e:
-            print(f'scorpion: error reading {f}: {e}', file=sys.stderr); rc |= 1
-    return rc
-
-def _fmt(rec)->str:
-    lines=[f"=== {rec['file']} ==="]
-    for k,v in rec['basic'].items():
-        lines.append(f"{k:>12}: {v}")
-    exif = rec['exif']
-    if exif:
-        lines.append('-- EXIF --')
-        for k in sorted(exif.keys()):
-            lines.append(f"{k:>20}: {exif[k]}")
-    else:
-        lines.append('(no EXIF)')
-    return '\n'.join(lines)
+ a=make_parser().parse_args(argv); rc=0
+ for f in a.files:
+  try:
+   if a.wipe: wipe_all_metadata(f)
+   if a.set_pairs: set_tags(f, parse_kv_list(a.set_pairs))
+   if a.del_keys: delete_tags(f, a.del_keys)
+   rc |= show_file(f, a.json)
+  except KeyboardInterrupt: return 130
+  except FileNotFoundError: print(f"scorpion: file not found: {f}", file=sys.stderr); rc|=1
+  except Exception as e: print(f"scorpion: error: {e}", file=sys.stderr); rc|=1
+ return rc
 
 if __name__=='__main__':
-    raise SystemExit(main())
+ raise SystemExit(main())

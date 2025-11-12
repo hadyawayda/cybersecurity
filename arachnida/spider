@@ -1,26 +1,20 @@
-#!/usr/bin/env py
+#!/usr/bin/env python3
 from __future__ import annotations
 import argparse, sys, os
-from arachnida.spider.util import CrawlConfig
-from arachnida.spider.crawler import crawl_and_download
+from src.spider.util import CrawlConfig
+from src.spider.crawler import crawl_and_download
 
 def make_parser():
-    p = argparse.ArgumentParser(prog='spider', add_help=False, description='Download images from a website.')
-    p.add_argument('url')
-    p.add_argument('-r', action='store_true', help='Recursive')
-    p.add_argument('-l', metavar='N', type=int, default=5, help='Max depth for -r (default 5)')
-    p.add_argument('-p', metavar='PATH', default='./data', help='Output directory (default ./data)')
-    p.add_argument('-h','--help', action='help', help='Show help and exit')
-    return p
+ p=argparse.ArgumentParser(prog='spider', add_help=False, description='Download images from a website.')
+ p.add_argument('url'); p.add_argument('-r', action='store_true', help='Recursive'); p.add_argument('-l', metavar='N', type=int, default=5, help='Max depth for -r (default 5)'); p.add_argument('-p', metavar='PATH', default='./data', help='Output directory (default ./data)'); p.add_argument('-h','--help', action='help', help='Show help and exit'); return p
 
 def main(argv=None)->int:
-    a = make_parser().parse_args(argv)
-    cfg = CrawlConfig(base_url=a.url, recursive=a.r, max_depth=a.l if a.r else 0, out_dir=a.p)
-    try: os.makedirs(cfg.out_dir, exist_ok=True)
-    except Exception as e: print(f'spider: cannot create output dir: {e}', file=sys.stderr); return 2
-    try: n = crawl_and_download(cfg); return 0 if n>=0 else 1
-    except KeyboardInterrupt: return 130
-    except Exception as e: print(f'spider: error: {e}', file=sys.stderr); return 1
+ a=make_parser().parse_args(argv); cfg=CrawlConfig(base_url=a.url, recursive=a.r, max_depth=a.l if a.r else 0, out_dir=a.p)
+ try: os.makedirs(cfg.out_dir, exist_ok=True)
+ except Exception as e: print(f'spider: cannot create output dir: {e}', file=sys.stderr); return 2
+ try: n=crawl_and_download(cfg); return 0 if n>=0 else 1
+ except KeyboardInterrupt: return 130
+ except Exception as e: print(f'spider: error: {e}', file=sys.stderr); return 1
 
 if __name__=='__main__':
-    raise SystemExit(main())
+ raise SystemExit(main())
