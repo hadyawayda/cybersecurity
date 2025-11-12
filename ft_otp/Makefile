@@ -146,24 +146,21 @@ clean:
 
 gui: $(VENV)
 	@echo "Launching ft_otp GUI (BONUS)..."
-	@if [ ! -f "$(TEST_KEYFILE)" ]; then \
-		echo "No key file found. Creating test key..."; \
-		echo "3132333435363738393031323334353637383930313233343536373839303132" > $(TEST_KEY); \
-		FT_OTP_PASSPHRASE=test123 $(PYTHON) $(MAIN) -g $(TEST_KEY); \
-	fi
-	$(PYTHON) $(GUI)
+	@echo "Creating test key with passphrase 'test123'..."
+	@echo "3132333435363738393031323334353637383930313233343536373839303132" > $(TEST_KEY)
+	@FT_OTP_PASSPHRASE=test123 $(PYTHON) $(MAIN) -g $(TEST_KEY) -o $(TEST_KEYFILE) >/dev/null 2>&1
+	@echo "Use passphrase 'test123' to unlock the key file in the GUI."
+	@$(PYTHON) $(GUI)
 
 qr: $(VENV)
 	@echo "Generating QR code (BONUS)..."
-	@if [ ! -f "$(TEST_KEYFILE)" ]; then \
-		echo "No key file found. Creating test key..."; \
-		echo "3132333435363738393031323334353637383930313233343536373839303132" > $(TEST_KEY); \
-		FT_OTP_PASSPHRASE=test123 $(PYTHON) $(MAIN) -g $(TEST_KEY); \
-	fi
-	@echo "This will generate a QR code that you can scan with authenticator apps."
+	@echo "Creating test key with passphrase 'test123'..."
+		@echo "3132333435363738393031323334353637383930313233343536373839303132" > $(TEST_KEY)
+		@FT_OTP_PASSPHRASE=test123 $(PYTHON) $(MAIN) -g $(TEST_KEY) -o $(TEST_KEYFILE) >/dev/null 2>&1
+		@echo "This will generate a QR code that you can scan with authenticator apps."
 	@echo "(e.g., Google Authenticator, Microsoft Authenticator, Authy)"
 	@echo ""
-	FT_OTP_PASSPHRASE=test123 $(PYTHON) $(QR) -k $(TEST_KEYFILE) -i "ft_otp Demo" -a "demo@example.com" --show-uri
+	@FT_OTP_PASSPHRASE=test123 $(PYTHON) $(QR) -k $(TEST_KEYFILE) -i "ft_otp Demo" -a "demo@example.com" --show-uri
 
 bonus: install
 	@echo "========================================="
