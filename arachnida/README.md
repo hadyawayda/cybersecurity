@@ -1,1 +1,2 @@
-# Arachnida full (mandatory + bonus) with src/ layout\nSee CLI usage inside files.\n
+# Arachnida full (mandatory + bonus) with src/ layout
+See CLI usage inside files.

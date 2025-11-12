@@ -1,1 +1,4 @@
-requests>=2.31.0\nbeautifulsoup4>=4.12.0\nPillow>=10.0.0\npiexif>=1.1.3\n
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+Pillow>=10.0.0
+piexif>=1.1.3
