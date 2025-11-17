@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ft_onion — Hidden Service</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #0b132b 0%, #1a1f3a 100%);
+        color: #e0e6f8;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin-bottom: 1rem;
+        font-size: 2rem;
+      }
+      .subtitle {
+        opacity: 0.8;
+        margin-bottom: 2rem;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        color: #a8b2d1;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        color: #e0e6f8;
+        font-family: inherit;
+        font-size: 1rem;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #64ffda;
+        background: rgba(255, 255, 255, 0.12);
+      }
+      button {
+        background: #64ffda;
+        color: #0b132b;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #52e8c4;
+        transform: translateY(-2px);
+      }
+      button:active {
+        transform: translateY(0);
+      }
+      .result {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(100, 255, 218, 0.1);
+        border-left: 3px solid #64ffda;
+        border-radius: 4px;
+        display: none;
+      }
+      .result.show {
+        display: block;
+      }
+      .result-text {
+        font-family: monospace;
+        word-break: break-all;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #a8b2d1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🧅 ft_onion Hidden Service</h1>
+      <p class="subtitle">
+        You're connected through Tor. This is an interactive secure toolbox.
+      </p>
+
+      <div class="card">
+        <h2>🔐 Text Encoder/Decoder</h2>
+        <label for="textInput">Enter text:</label>
+        <textarea
+          id="textInput"
+          rows="3"
+          placeholder="Type your message here..."
+        ></textarea>
+        <label for="encodeType">Encoding type:</label>
+        <select id="encodeType">
+          <option value="base64">Base64</option>
+          <option value="hex">Hexadecimal</option>
+          <option value="rot13">ROT13</option>
+        </select>
+        <button onclick="encode()">Encode</button>
+        <button onclick="decode()">Decode</button>
+        <div id="encodeResult" class="result">
+          <strong>Result:</strong>
+          <div class="result-text" id="encodeOutput"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🔢 Hash Calculator</h2>
+        <label for="hashInput">Enter text to hash:</label>
+        <input type="text" id="hashInput" placeholder="Enter text..." />
+        <label for="hashType">Hash algorithm:</label>
+        <select id="hashType">
+          <option value="sha256">SHA-256</option>
+          <option value="sha1">SHA-1</option>
+          <option value="md5">MD5</option>
+        </select>
+        <button onclick="calculateHash()">Calculate Hash</button>
+        <div id="hashResult" class="result">
+          <strong>Hash:</strong>
+          <div class="result-text" id="hashOutput"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎲 Random Generator</h2>
+        <label for="randomType">Generate:</label>
+        <select id="randomType">
+          <option value="password">Strong Password (16 chars)</option>
+          <option value="uuid">UUID v4</option>
+          <option value="number">Random Number (1-1000)</option>
+        </select>
+        <button onclick="generateRandom()">Generate</button>
+        <div id="randomResult" class="result">
+          <strong>Generated:</strong>
+          <div class="result-text" id="randomOutput"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Text Encoding/Decoding
+      function encode() {
+        const text = document.getElementById("textInput").value;
+        const type = document.getElementById("encodeType").value;
+        let result = "";
+        try {
+          if (type === "base64")
+            result = btoa(unescape(encodeURIComponent(text)));
+          else if (type === "hex")
+            result = Array.from(new TextEncoder().encode(text))
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("");
+          else if (type === "rot13")
+            result = text.replace(/[a-zA-Z]/g, (c) =>
+              String.fromCharCode(
+                (c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26
+              )
+            );
+          showResult("encodeResult", "encodeOutput", result);
+        } catch (e) {
+          showResult("encodeResult", "encodeOutput", "Error: " + e.message);
+        }
+      }
+
+      function decode() {
+        const text = document.getElementById("textInput").value;
+        const type = document.getElementById("encodeType").value;
+        let result = "";
+        try {
+          if (type === "base64")
+            result = decodeURIComponent(escape(atob(text)));
+          else if (type === "hex")
+            result = new TextDecoder().decode(
+              new Uint8Array(text.match(/.{2}/g).map((b) => parseInt(b, 16)))
+            );
+          else if (type === "rot13")
+            result = text.replace(/[a-zA-Z]/g, (c) =>
+              String.fromCharCode(
+                (c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26
+              )
+            );
+          showResult("encodeResult", "encodeOutput", result);
+        } catch (e) {
+          showResult("encodeResult", "encodeOutput", "Error: " + e.message);
+        }
+      }
+
+      // Hash Calculator (using SubtleCrypto API)
+      async function calculateHash() {
+        const text = document.getElementById("hashInput").value;
+        const type = document.getElementById("hashType").value;
+        const algo = type.toUpperCase().replace(/(\d+)/, "-$1");
+        try {
+          const buffer = new TextEncoder().encode(text);
+          const hashBuffer = await crypto.subtle.digest(algo, buffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          showResult("hashResult", "hashOutput", hashHex);
+        } catch (e) {
+          showResult("hashResult", "hashOutput", "Error: " + e.message);
+        }
+      }
+
+      // Random Generator
+      function generateRandom() {
+        const type = document.getElementById("randomType").value;
+        let result = "";
+        if (type === "password") {
+          const chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+          const arr = new Uint8Array(16);
+          crypto.getRandomValues(arr);
+          result = Array.from(arr)
+            .map((x) => chars[x % chars.length])
+            .join("");
+        } else if (type === "uuid") {
+          result = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+            (
+              c ^
+              (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+            ).toString(16)
+          );
+        } else if (type === "number") {
+          result =
+            Math.floor(
+              (crypto.getRandomValues(new Uint32Array(1))[0] / 0xffffffff) *
+                1000
+            ) + 1;
+        }
+        showResult("randomResult", "randomOutput", result);
+      }
+
+      function showResult(containerId, outputId, text) {
+        document.getElementById(outputId).textContent = text;
+        document.getElementById(containerId).classList.add("show");
+      }
+    </script>
+  </body>
+</html>

@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import sys
 import argparse
-from ft_otp_pkg.io_utils import read_hex_key_file, validate_hex_key, secure_write, read_bytes
-from ft_otp_pkg.crypto_utils import prompt_passphrase, encrypt_key, decrypt_key
-from ft_otp_pkg.otp import totp
+from src.io_utils import read_hex_key_file, validate_hex_key, secure_write, read_bytes
+from src.crypto_utils import prompt_passphrase, encrypt_key, decrypt_key
+from src.otp import totp
 
 DEFAULT_KEY_PATH = "ft_otp.key"
 

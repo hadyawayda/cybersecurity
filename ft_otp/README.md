@@ -77,8 +77,8 @@ Non‑interactive (CI) runs can use the environment variable `FT_OTP_PASSPHRASE`
 
 ## How it works
 
-- **HOTP/TOTP**: `ft_otp_pkg.otp` implements HOTP and TOTP directly with `hmac`/`hashlib` and RFC dynamic truncation.
-- **Key storage**: `ft_otp_pkg.crypto_utils` encrypts the raw key using AES‑256‑GCM. The AES key is derived from your
+- **HOTP/TOTP**: `src.otp` implements HOTP and TOTP directly with `hmac`/`hashlib` and RFC dynamic truncation.
+- **Key storage**: `src.crypto_utils` encrypts the raw key using AES‑256‑GCM. The AES key is derived from your
   passphrase via scrypt (`N=2^14, r=8, p=1`). The file `ft_otp.key` is a compact JSON containing:
   - magic/version (`FTOTP1`), scrypt params and salt, AES‑GCM nonce, and ciphertext+tag (base64).
 - **Permissions**: on POSIX, the key file is saved with `0600` permissions.
@@ -109,7 +109,7 @@ ft_otp/
 ├─ ft_otp.py                   # CLI (mandatory)
 ├─ ft_otp_gui.py               # GUI (BONUS)
 ├─ ft_otp_qr.py                # QR code generator (BONUS)
-├─ ft_otp_pkg/
+├─ src/
 │  ├─ __init__.py
 │  ├─ otp.py                   # HOTP/TOTP (RFC 4226/6238)
 │  ├─ crypto_utils.py          # scrypt + AES‑GCM key encryption

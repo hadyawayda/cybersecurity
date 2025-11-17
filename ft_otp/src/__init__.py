@@ -1,4 +1,4 @@
-"""ft_otp_pkg
+"""src
 Utilities for the *ft_otp* assignment: secure key storage and RFC-compliant HOTP/TOTP generation.
 """
 __all__ = ["otp", "crypto_utils", "io_utils"]

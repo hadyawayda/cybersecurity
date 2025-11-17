@@ -136,7 +136,7 @@ test-oathtool:
 clean:
 	@echo "Cleaning up..."
 	@rm -rf $(VENV)
-	@rm -rf __pycache__ ft_otp_pkg/__pycache__
+	@rm -rf __pycache__ src/__pycache__
 	@find . -type f -name "*.pyc" -delete
 	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	@rm -f $(TEST_KEY) $(TEST_KEYFILE)

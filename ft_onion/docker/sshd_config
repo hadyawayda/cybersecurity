@@ -1,0 +1,14 @@
+Port 4242
+Protocol 2
+UsePAM no
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+PubkeyAuthentication yes
+X11Forwarding no
+AllowTcpForwarding yes
+ClientAliveInterval 300
+ClientAliveCountMax 2
+PrintMotd no
+Subsystem sftp /usr/lib/openssh/sftp-server

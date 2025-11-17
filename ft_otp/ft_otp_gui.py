@@ -9,9 +9,9 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import threading
 import time
-from ft_otp_pkg.crypto_utils import decrypt_key
-from ft_otp_pkg.io_utils import read_bytes
-from ft_otp_pkg.otp import totp
+from src.crypto_utils import decrypt_key
+from src.io_utils import read_bytes
+from src.otp import totp
 
 class OTPTimer:
     """Timer that tracks TOTP validity period."""

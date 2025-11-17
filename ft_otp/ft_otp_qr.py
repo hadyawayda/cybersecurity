@@ -18,8 +18,8 @@ import sys
 import argparse
 import base64
 import urllib.parse
-from ft_otp_pkg.crypto_utils import prompt_passphrase, decrypt_key
-from ft_otp_pkg.io_utils import read_bytes
+from src.crypto_utils import prompt_passphrase, decrypt_key
+from src.io_utils import read_bytes
 
 try:
     import qrcode
